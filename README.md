@@ -9,11 +9,19 @@ This project collects stock data, processes it, and provides insights via APIs a
 - Pandas
 - Matplotlib
 
-## 📌 Features
-- Fetch stock data
-- Clean & analyze data
-- REST API endpoints
-- Visualization dashboard
+## ✨ Features
+- Stock data fetching (yfinance)
+- Data cleaning & analysis
+- REST API (FastAPI)
+- Interactive dashboard (Chart.js)
+- Stock comparison feature
+- Volatility / insights
+
+## 📊 Example APIs
+- /data/TCS
+- /summary/TCS
+- /compare?symbol1=TCS&symbol2=INFY
+
 
 ## ▶️ How to Run
 ```bash

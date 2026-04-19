@@ -8,17 +8,33 @@
 
 <h2>📊 Stock Dashboard</h2>
 
-<button onclick="loadData()">Load TCS Data</button>
+<!-- <button onclick="loadData()">Load TCS Data</button> -->
+<select id="stock1">
+    <option value="TCS">TCS</option>
+    <option value="INFY">INFY</option>
+</select>
+
+<select id="stock2">
+    <option value="INFY">INFY</option>
+    <option value="TCS">TCS</option>
+</select>
+
+<button onclick="compare()">Compare</button>
 
 <canvas id="chart" width="800" height="400"></canvas>
 
 <script>
-async function loadData() {
-    const response = await fetch("http://127.0.0.1:8000/data/TCS");
-    const data = await response.json();
+async function compare() {
+    const s1 = document.getElementById("stock1").value;
+    const s2 = document.getElementById("stock2").value;
 
-    const labels = data.map(item => item.Date);
-    const prices = data.map(item => item.Close);
+    const res = await fetch(`http://127.0.0.1:8000/compare?symbol1=${s1}&symbol2=${s2}`);
+    const data = await res.json();
+
+    const labels = data.symbol1.map(item => item.Date);
+
+    const prices1 = data.symbol1.map(item => item.Close);
+    const prices2 = data.symbol2.map(item => item.Close);
 
     const ctx = document.getElementById("chart").getContext("2d");
 
@@ -26,11 +42,18 @@ async function loadData() {
         type: "line",
         data: {
             labels: labels,
-            datasets: [{
-                label: "TCS Closing Price",
-                data: prices,
-                borderWidth: 2
-            }]
+            datasets: [
+                {
+                    label: s1,
+                    data: prices1,
+                    borderWidth: 2
+                },
+                {
+                    label: s2,
+                    data: prices2,
+                    borderWidth: 2
+                }
+            ]
         }
     });
 }

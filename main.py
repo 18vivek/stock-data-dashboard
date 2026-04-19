@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import pandas as pd
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
+import yfinance as yf
 
 app = FastAPI()
 
@@ -78,3 +79,34 @@ def get_summary(symbol: str):
         }
 
     return {"error": "Company not found"}
+
+@app.get("/compare")
+def compare_stocks(symbol1: str, symbol2: str):
+
+    import yfinance as yf
+    import pandas as pd
+
+    data1 = yf.download(f"{symbol1}.NS", period="1mo")
+    data2 = yf.download(f"{symbol2}.NS", period="1mo")
+
+    # ✅ Flatten columns (VERY IMPORTANT)
+    if isinstance(data1.columns, pd.MultiIndex):
+        data1.columns = data1.columns.get_level_values(0)
+
+    if isinstance(data2.columns, pd.MultiIndex):
+        data2.columns = data2.columns.get_level_values(0)
+
+    data1 = data1.reset_index()
+    data2 = data2.reset_index()
+
+    # ✅ Safe numeric conversion
+    data1["Close"] = pd.to_numeric(data1["Close"], errors="coerce")
+    data2["Close"] = pd.to_numeric(data2["Close"], errors="coerce")
+
+    data1.fillna(0, inplace=True)
+    data2.fillna(0, inplace=True)
+
+    return {
+        "symbol1": data1[["Date", "Close"]].to_dict(orient="records"),
+        "symbol2": data2[["Date", "Close"]].to_dict(orient="records")
+    }
